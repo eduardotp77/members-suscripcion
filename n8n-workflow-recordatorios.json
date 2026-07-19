@@ -1,0 +1,465 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "fromEmail": "soporte@sociosflix.com",
+        "toEmail": "={{ $json.correo }}",
+        "subject": "=⏰ Tu suscripción a {{ $json.producto }} vence en 3 días",
+        "html": "=<html><body style='font-family:Arial,sans-serif;background:#0a0a0a;color:#fff;padding:40px'><div style='max-width:600px;margin:0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px'><h1 style='color:#a855f7;margin-bottom:8px'>⏰ Recordatorio de Vencimiento</h1><p style='color:rgba(255,255,255,0.7);font-size:16px'>Hola <strong style='color:#fff'>{{ $json.nombre }}</strong>,</p><p style='color:rgba(255,255,255,0.7);font-size:15px'>Tu suscripción al producto <strong style='color:#a855f7'>{{ $json.producto }}</strong> vencerá el <strong style='color:#fff'>{{ $json.fecha_vencimiento }}</strong>, es decir, <strong style='color:#f59e0b'>en 3 días</strong>.</p><div style='background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:12px;padding:20px;margin:24px 0'><p style='margin:0;color:rgba(255,255,255,0.5);font-size:13px'>DETALLE DE SUSCRIPCIÓN</p><p style='margin:8px 0 0;color:#fff;font-size:18px;font-weight:bold'>{{ $json.producto }}</p><p style='margin:4px 0 0;color:rgba(255,255,255,0.5);font-size:14px'>Valor: ${{ $json.valor_cobrado }} USD</p></div><p style='color:rgba(255,255,255,0.6);font-size:14px'>Para renovar tu acceso, contáctanos antes de la fecha de vencimiento.</p><p style='color:rgba(255,255,255,0.3);font-size:12px;margin-top:32px'>Si ya realizaste tu pago, ignora este mensaje.</p></div></body></html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "16752916-85fa-4ee4-81ed-ecb7ea48d25a",
+      "name": "Email - Recordatorio al Cliente",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2848,
+        672
+      ],
+      "webhookId": "b2f75bba-e59d-4d98-bfd4-bc236f7fbbb0",
+      "credentials": {
+        "smtp": {
+          "id": "Dz05aNDBbvUfUoSK",
+          "name": "SMTP Flix-Corporativo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Después del Wait, $json contiene la respuesta de EvolutionAPI.\n// Recuperamos los datos originales del cliente desde el nodo Loop.\nconst cliente = $('Loop - 1 cliente a la vez').item.json;\nreturn [{ json: cliente }];"
+      },
+      "id": "e88b61c1-9777-485a-8656-d9cb58533457",
+      "name": "Recuperar datos del cliente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2608,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 8
+      },
+      "id": "4ec4248c-becc-4f95-826d-b8ce083312d1",
+      "name": "Esperar 8s entre mensajes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2368,
+        528
+      ],
+      "webhookId": "sociosmembres-wait-wa"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.sociosflix.com/message/sendText/socios",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "=868A86ABEC49-477B-B0D4-CF773D2081E7"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.whatsapp.replace(/[^\\d]/g, '') }}\",\n  \"text\": \"Hola {{ $json.nombre }} 👋\\n\\nTe recordamos que tu suscripción al producto *{{ $json.producto }}* vence el *{{ $json.fecha_vencimiento }}*, es decir, en *3 días*.\\n\\nPara renovar y seguir disfrutando del acceso, recuerda tener saldo en su tarjeta.\\n\\n¡Gracias por confiar en nosotros! 🙏\"\n}",
+        "options": {}
+      },
+      "id": "c98b9319-5c64-4b8f-a15b-8b732f0f9e40",
+      "name": "EvolutionAPI - WhatsApp al Cliente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        528
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DtsgNM6xH1RBrexb",
+          "name": "Header - SociosFlix-evo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "check-wa",
+              "leftValue": "={{ $json.whatsapp }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a85488c6-34ca-44e3-aedd-ae49691044ea",
+      "name": "¿Tiene WhatsApp?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ed6a0ba6-02a8-4d44-bddc-a8ce519d03af",
+      "name": "Loop - 1 cliente a la vez",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1616,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filtrar clientes cuya fecha_vencimiento sea en 3 días (lógica app)\n// CORREGIDO: La app usa differenceInDays que trunca fracciones de hora.\n// A las 8PM del día X, differenceInDays hasta el día X+4 devuelve 3.\n// Por eso buscamos fecha_vencimiento = hoy (Sao Paulo) + 4 días calendario.\n// Timezone: America/Sao_Paulo (UTC-3)\nconst OFFSET_SAO_PAULO = -3 * 60; // minutos\nconst ahora = new Date();\nconst localMs = ahora.getTime() + (OFFSET_SAO_PAULO - (-ahora.getTimezoneOffset())) * 60000;\nconst hoyLocal = new Date(localMs);\nhoyLocal.setDate(hoyLocal.getDate() + 4);\n\nconst año = hoyLocal.getFullYear();\nconst mes = String(hoyLocal.getMonth() + 1).padStart(2, '0');\nconst dia = String(hoyLocal.getDate()).padStart(2, '0');\nconst fechaBuscada = `${año}-${mes}-${dia}`;\n\nconst items = $input.all();\nconst filtrados = items.filter(item => item.json.fecha_vencimiento === fechaBuscada);\nif (filtrados.length === 0) return [];\nreturn filtrados;"
+      },
+      "id": "9144e978-f898-4bea-ac80-66307d40356e",
+      "name": "Filtro: vencen EXACTAMENTE en 3 días",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clientes",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "estado",
+              "condition": "eq",
+              "keyValue": "activa"
+            }
+          ]
+        }
+      },
+      "id": "3f3ec98d-0c1c-4abc-ac68-1884b8b8c195",
+      "name": "Traer clientes activos (8PM)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        704
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "dCDIef4mnQByBsQe",
+          "name": "Supabase Gmail-Socios"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 20 * * *"
+            }
+          ]
+        }
+      },
+      "id": "33c01c0c-5cd9-4f6d-8646-e7e02f0a7ab4",
+      "name": "Cron 8PM - Notificar Clientes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "soporte@sociosflix.com",
+        "toEmail": "={{ $json.ownerEmail }}",
+        "subject": "=📋 {{ $json.total }} suscripción(es) vencen HOY - SociosMembres",
+        "html": "=<html><body style='font-family:Arial,sans-serif;background:#0a0a0a;color:#fff;padding:40px'><div style='max-width:700px;margin:0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px'><h1 style='color:#a855f7;margin-bottom:4px'>📋 Resumen Diario</h1><p style='color:rgba(255,255,255,0.4);margin-top:0'>{{ $json.fecha }}</p><p style='color:rgba(255,255,255,0.7)'>Hola <strong>{{ $json.ownerName }}</strong>, estos son tus clientes que vencen <strong style='color:#ef4444'>hoy</strong>:</p><div style='background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px 20px;margin:20px 0'><p style='margin:0;color:rgba(255,255,255,0.5);font-size:13px'>VENCEN HOY</p><p style='margin:4px 0 0;color:#ef4444;font-size:28px;font-weight:bold'>{{ $json.total }} cliente(s)</p></div><table style='width:100%;border-collapse:collapse'><thead><tr style='border-bottom:1px solid rgba(255,255,255,0.1)'><th style='padding:10px 12px;text-align:left;color:rgba(255,255,255,0.4);font-size:12px;font-weight:normal'>#</th><th style='padding:10px 12px;text-align:left;color:rgba(255,255,255,0.4);font-size:12px;font-weight:normal'>CLIENTE</th><th style='padding:10px 12px;text-align:left;color:rgba(255,255,255,0.4);font-size:12px;font-weight:normal'>PRODUCTO</th><th style='padding:10px 12px;text-align:left;color:rgba(255,255,255,0.4);font-size:12px;font-weight:normal'>VALOR</th><th style='padding:10px 12px;text-align:left;color:rgba(255,255,255,0.4);font-size:12px;font-weight:normal'>CORREO</th></tr></thead><tbody>{{ $json.listaHtml }}</tbody></table><p style='color:rgba(255,255,255,0.3);font-size:12px;margin-top:32px;text-align:center'>SociosMembres · Resumen automático diario</p></div></body></html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "bbba7cb4-d5fa-4d11-8514-97d5dedaffb6",
+      "name": "Email - Resumen a cada Dueño",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1856,
+        240
+      ],
+      "webhookId": "9081aec8-c2b6-45b2-8f95-1d256ce91502",
+      "credentials": {
+        "smtp": {
+          "id": "Dz05aNDBbvUfUoSK",
+          "name": "SMTP Flix-Corporativo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Agrupar todos los items por user_id y construir resumen por dueño\nconst items = $input.all();\nif (!items || items.length === 0) return [];\n\nconst grupos = {};\nfor (const item of items) {\n  const c = item.json;\n  const uid = c.user_id;\n  const perfil = c.profiles || {};\n  if (!grupos[uid]) {\n    grupos[uid] = {\n      ownerEmail: perfil.email || '',\n      ownerName: perfil.nombre || 'Usuario',\n      clientes: []\n    };\n  }\n  grupos[uid].clientes.push(c);\n}\n\nconst fecha = new Date().toLocaleDateString('es-ES', {\n  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'\n});\n\nreturn Object.values(grupos)\n  .filter(g => g.ownerEmail)\n  .map(g => {\n    const listaHtml = g.clientes.map((c, i) => `\n      <tr style=\"border-bottom:1px solid rgba(255,255,255,0.05)\">\n        <td style=\"padding:12px;color:rgba(255,255,255,0.4);font-size:13px\">${i + 1}</td>\n        <td style=\"padding:12px;color:#fff;font-weight:bold\">${c.nombre}</td>\n        <td style=\"padding:12px;color:#a855f7\">${c.producto}</td>\n        <td style=\"padding:12px;color:#10b981\">$${c.valor_cobrado} USD</td>\n        <td style=\"padding:12px;color:rgba(255,255,255,0.6);font-size:13px\">${c.correo}</td>\n      </tr>`).join('');\n    return {\n      json: {\n        ownerEmail: g.ownerEmail,\n        ownerName: g.ownerName,\n        total: g.clientes.length,\n        listaHtml,\n        fecha\n      }\n    };\n  });"
+      },
+      "id": "65bfb2ea-bce5-4399-b2f4-eea2305e71b6",
+      "name": "Agrupar por Usuario",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filtrar clientes cuya fecha_vencimiento sea EXACTAMENTE hoy\n// Timezone: America/Sao_Paulo (UTC-3)\nconst OFFSET_SAO_PAULO = -3 * 60; // minutos\nconst ahora = new Date();\nconst localMs = ahora.getTime() + (OFFSET_SAO_PAULO - (-ahora.getTimezoneOffset())) * 60000;\nconst hoyLocal = new Date(localMs);\n\nconst año = hoyLocal.getFullYear();\nconst mes = String(hoyLocal.getMonth() + 1).padStart(2, '0');\nconst dia = String(hoyLocal.getDate()).padStart(2, '0');\nconst fechaBuscada = `${año}-${mes}-${dia}`;\n\nconst items = $input.all();\nconst filtrados = items.filter(item => item.json.fecha_vencimiento === fechaBuscada);\nif (filtrados.length === 0) return [];\nreturn filtrados;"
+      },
+      "id": "479cf770-5c3d-4b0e-b636-64db2e9f12e4",
+      "name": "Filtro: vencen EXACTAMENTE hoy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clientes",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "estado",
+              "condition": "eq",
+              "keyValue": "activa"
+            }
+          ]
+        }
+      },
+      "id": "d11cc6de-b542-4a74-9dfb-86b2137bf033",
+      "name": "Traer clientes activos (10AM)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        240
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "dCDIef4mnQByBsQe",
+          "name": "Supabase Gmail-Socios"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "23c16bfd-d478-43ba-ab61-5baaef6d9fbc",
+      "name": "Cron 10AM - Resumen Dueños",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "Email - Recordatorio al Cliente": {
+      "main": [
+        [
+          {
+            "node": "Loop - 1 cliente a la vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperar datos del cliente": {
+      "main": [
+        [
+          {
+            "node": "Email - Recordatorio al Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar 8s entre mensajes": {
+      "main": [
+        [
+          {
+            "node": "Recuperar datos del cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EvolutionAPI - WhatsApp al Cliente": {
+      "main": [
+        [
+          {
+            "node": "Esperar 8s entre mensajes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Tiene WhatsApp?": {
+      "main": [
+        [
+          {
+            "node": "EvolutionAPI - WhatsApp al Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Recordatorio al Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - 1 cliente a la vez": {
+      "main": [
+        [],
+        [
+          {
+            "node": "¿Tiene WhatsApp?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro: vencen EXACTAMENTE en 3 días": {
+      "main": [
+        [
+          {
+            "node": "Loop - 1 cliente a la vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traer clientes activos (8PM)": {
+      "main": [
+        [
+          {
+            "node": "Filtro: vencen EXACTAMENTE en 3 días",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron 8PM - Notificar Clientes": {
+      "main": [
+        [
+          {
+            "node": "Traer clientes activos (8PM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar por Usuario": {
+      "main": [
+        [
+          {
+            "node": "Email - Resumen a cada Dueño",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro: vencen EXACTAMENTE hoy": {
+      "main": [
+        [
+          {
+            "node": "Agrupar por Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traer clientes activos (10AM)": {
+      "main": [
+        [
+          {
+            "node": "Filtro: vencen EXACTAMENTE hoy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron 10AM - Resumen Dueños": {
+      "main": [
+        [
+          {
+            "node": "Traer clientes activos (10AM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "32afd78115278d25eca79e235d0ef0d8a83fc9a5368172e764d610539ef8af35"
+  }
+}

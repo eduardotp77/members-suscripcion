@@ -1,0 +1,311 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Sistema de Diseño Glassmorphism Dark
+   Tema: Negro profundo con efectos de vidrio y gradientes violeta-rosa
+*/
+
+@layer base {
+  :root {
+    /* Fondo principal negro puro */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    /* Cards con efecto glass */
+    --card: 0 0% 100% / 0.05;
+    --card-foreground: 0 0% 100%;
+
+    /* Popover glass */
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Primary: Violeta principal */
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Verde esmeralda */
+    --secondary: 160 84% 39%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted: Gris oscuro */
+    --muted: 220 9% 20%;
+    --muted-foreground: 220 9% 60%;
+
+    /* Accent: Rosa pink */
+    --accent: 330 81% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Estados */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+
+    /* Bordes y inputs glass */
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.05;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar glass */
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100% / 0.05;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 100% / 0.1;
+    --sidebar-ring: 262 83% 58%;
+
+    /* Colores de estado para badges */
+    --estado-activa: 160 84% 39%;
+    --estado-vencida: 0 84% 60%;
+    --estado-pendiente: 38 92% 50%;
+    --estado-cancelada: 220 9% 46%;
+
+    /* Gradientes como custom properties */
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(330 81% 60%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(217 91% 60%) 100%);
+    --gradient-violet: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(239 84% 67%) 100%);
+
+    /* Efectos de sombra y glow */
+    --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 8px 40px rgba(139, 92, 246, 0.15);
+    --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+    --shadow-glow-pink: 0 0 20px rgba(236, 72, 153, 0.3);
+    --shadow-button: 0 4px 20px rgba(139, 92, 246, 0.4);
+
+    /* Variables para AreaChart interactivo */
+    --chart-background: 0 0% 0%;
+    --chart-foreground: 0 0% 100%;
+    --chart-foreground-muted: 220 9% 60%;
+    --chart-line-primary: 262 83% 58%;
+    --chart-line-secondary: 330 81% 60%;
+    --chart-crosshair: 262 83% 58% / 0.5;
+    --chart-grid: 0 0% 100% / 0.05;
+    --chart-tooltip-background: 0 0% 5% / 0.9;
+    --chart-tooltip-foreground: 0 0% 100%;
+    --chart-tooltip-muted: 220 9% 60%;
+    --chart-marker-background: 0 0% 5%;
+    --chart-marker-border: 0 0% 100% / 0.1;
+    --chart-marker-foreground: 0 0% 100%;
+    --chart-marker-badge-background: 262 83% 58%;
+    --chart-marker-badge-foreground: 0 0% 100%;
+    --chart-ring-background: 262 83% 58% / 0.25;
+    --chart-label: 220 9% 60%;
+    --chart-segment-background: 262 83% 58%;
+    --chart-segment-line: 262 83% 58%;
+    --chart-indicator-color: 262 83% 58%;
+    --chart-indicator-secondary-color: 330 81% 60%;
+  }
+
+  /* Modo oscuro es el predeterminado */
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Scrollbar personalizado para tema dark */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer components {
+  /* Efecto glassmorphism para cards */
+  .glass-card {
+    @apply relative overflow-hidden rounded-xl border border-white/10 bg-white/5;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    @apply border-white/20 bg-white/[0.08];
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Botones con gradiente */
+  .btn-gradient-primary {
+    background: var(--gradient-primary);
+    @apply text-white font-medium shadow-lg;
+    box-shadow: var(--shadow-button);
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient-primary:hover {
+    @apply opacity-90 scale-[1.02];
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-gradient-secondary {
+    background: var(--gradient-secondary);
+    @apply text-white font-medium shadow-lg;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient-secondary:hover {
+    @apply opacity-90 scale-[1.02];
+  }
+
+  /* Input glass */
+  .input-glass {
+    @apply bg-white/5 border-white/10 text-white placeholder:text-white/40;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+  }
+
+  .input-glass:focus {
+    @apply border-primary/50 bg-white/[0.08] ring-1 ring-primary/30;
+  }
+
+  /* Badge de estado */
+  .badge-activa {
+    @apply bg-emerald-500/20 text-emerald-400 border-emerald-500/30;
+  }
+
+  .badge-vencida {
+    @apply bg-red-500/20 text-red-400 border-red-500/30;
+  }
+
+  .badge-pendiente {
+    @apply bg-amber-500/20 text-amber-400 border-amber-500/30;
+  }
+
+  .badge-cancelada {
+    @apply bg-gray-500/20 text-gray-400 border-gray-500/30;
+  }
+
+  /* Animaciones */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out forwards;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+}
+
+@layer utilities {
+  /* Utilidades de texto */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-secondary {
+    background: var(--gradient-secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Utilidades para AreaChart */
+  .text-chart-tooltip-foreground {
+    color: hsl(var(--chart-tooltip-foreground));
+  }
+
+  .text-chart-tooltip-muted {
+    color: hsl(var(--chart-tooltip-muted));
+  }
+
+  .text-chart-label {
+    color: hsl(var(--chart-label));
+  }
+
+  .bg-popover {
+    background-color: hsl(var(--chart-tooltip-background));
+  }
+
+  .text-popover-foreground {
+    color: hsl(var(--chart-tooltip-foreground));
+  }
+}
+
+/* Keyframes para animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
+  }
+}
